@@ -18,7 +18,7 @@ export default function Dashboard() {
                 </>
             ) : (
                 <>
-                    <h1>You're not logged in.</h1>
+                    <h1>You&apos;re not logged in.</h1>
                     <button onClick={() => signIn('google')}>Sign in with Google</button>
                     <button onClick={() => signIn('github')}>Sign in with Github</button>
                 </>
