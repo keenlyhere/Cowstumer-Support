@@ -1,10 +1,22 @@
+import ChatInterface from "@/components/ChatInterface/ChatInterface";
 import styles from "./page.module.css";
 import Dashboard from "@/components/Dashboard";
+import Sidebar from "@/components/Sidebar/Sidebar";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/authOptions";
+import { redirect } from "next/navigation";
 
-export default function Home() {
+export default async function Home() {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    redirect('/signin')
+  }
   return (
-    <main className={styles.main}>
-      <Dashboard />
+    <main className={styles.pageContainer}>
+      {/* <Dashboard /> */}
+      <Sidebar />
+      <ChatInterface />
     </main>
   );
 }

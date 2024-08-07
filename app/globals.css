@@ -2,4 +2,9 @@
   box-sizing: border-box;
   padding: 0;
   margin: 0;
+  color: #1b3012;
+}
+
+.main-container {
+  display: flex;
 }

@@ -1,6 +1,8 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import SessionWrapper from "@/components/SessionWrapper";
+import { ChatProvider } from "@/context/ChatContext";
+import Sidebar from "@/components/Sidebar/Sidebar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -12,12 +14,14 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <SessionWrapper>
-      <html lang="en">
-        <head>
-          <link rel="manifest" href="public/manifest.json" />
-        </head>
-        <body className={inter.className}>{children}</body>
-      </html>
+        <html lang="en">
+          <head>
+            <link rel="manifest" href="public/manifest.json" />
+          </head>
+          <body className={`${inter.className}`}>
+            {children}
+          </body>
+        </html>
     </SessionWrapper>
   );
 }

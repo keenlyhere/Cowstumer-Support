@@ -1,0 +1,48 @@
+.sidebar {
+  width: 300px;
+  background-color: #c9e2bb;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  height: 100vh;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sign-out-button {
+  background: none;
+  border: none;
+  color: #1b3012;
+  padding: 1rem;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.sign-out-button:hover {
+  background-color: #E1F8D4;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #1b3012;
+}
+
+.sidebar-content {
+  flex: 1;
+  margin-top: 20px;
+}
+
+.chat-history-item {
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: #4b47c3;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.chat-history-item:hover {
+  background-color: #f5fbf2;
+}
