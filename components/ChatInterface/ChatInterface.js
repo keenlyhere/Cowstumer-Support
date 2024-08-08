@@ -6,10 +6,9 @@ import { useSession } from 'next-auth/react';
 
 export default function ChatInterface() {
     const { data: session } = useSession();
-    const { getChats, messages, setMessages } = useChatContext();
+    const { getChats, messages, setMessages, chatId, setChatId } = useChatContext();
     const [ message, setMessage ] = useState('');
     const [ loading, setLoading ] = useState(false);
-    const [ chatId, setChatId ] = useState(null);
 
     // to-do: automatically scroll to bottom (most recent message) if overflowed
 
