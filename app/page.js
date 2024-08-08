@@ -1,6 +1,5 @@
 import ChatInterface from "@/components/ChatInterface/ChatInterface";
 import styles from "./page.module.css";
-import Dashboard from "@/components/Dashboard";
 import Sidebar from "@/components/Sidebar/Sidebar";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
@@ -14,7 +13,6 @@ export default async function Home() {
   }
   return (
     <main className={styles.pageContainer}>
-      {/* <Dashboard /> */}
       <Sidebar />
       <ChatInterface />
     </main>

@@ -8,22 +8,23 @@ import Link from "next/link";
 export default async function Signin() {
     const session = await getServerSession(authOptions);
 
-    // if (session) {
-    //     redirect('/');
-    // }
-  return (
-    <section className="signup-page">
-        <div className="welcome-section">
-            <h1>Welcome to</h1>
-            <h1>Cowstumer Support</h1>
-            <p>Your one-stop solution for efficient and friendly customer support. We are here to assist you with all your queries and ensure you have a smooth experience. Sign up now to get started!</p>
-        </div>
-        <div className="form-section">
-            <h2>Sign in</h2>
-            <Form />
-            <p className="form-other">Don&apos;t have an account?<span className="form-link"><Link href='/register' className="form-link">Signup</Link></span></p>
+    if (session) {
+        redirect('/');
+    }
 
-        </div>
-    </section>
-  )
+    return (
+        <section className="signup-page">
+            <div className="welcome-section">
+                <h1>Welcome to</h1>
+                <h1>Cowstumer Support</h1>
+                <p>Your one-stop solution for efficient and friendly customer support. We are here to assist you with all your queries and ensure you have a smooth experience. Sign up now to get started!</p>
+            </div>
+            <div className="form-section">
+                <h2>Sign in</h2>
+                <Form />
+                <p className="form-other">Don&apos;t have an account?<span className="form-link"><Link href='/register' className="form-link">Signup</Link></span></p>
+
+            </div>
+        </section>
+    )
 }

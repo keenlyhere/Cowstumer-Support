@@ -1,7 +1,7 @@
 .signup-page {
   display: flex;
   height: 100vh;
-  background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+  background: linear-gradient(90deg, #c9e2bb 0%, #9ab28c 100%);
 }
 
 .welcome-section {
@@ -107,19 +107,33 @@
   padding-top: 0.5rem;
 }
 
-button[type="submit"] {
+button[type="submit"],
+.button-demo:hover {
   width: 100%;
   padding: 0.75rem;
-  background: #6a11cb;
+  background: #9ab28c;
   color: white;
   border: none;
   border-radius: 4px;
   font-size: 1rem;
   cursor: pointer;
+  border: 1px solid #9ab28c;
+  transition: background 0.2s ease-out;
 }
 
-button[type="submit"]:hover {
-  background: #2575fc;
+button[type="submit"]:hover,
+.button-demo {
+  border: 1px solid #c9e2bb;
+  color: #9ab28c;
+  background: white;
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.button-demo {
+  margin-top: 0.75rem;
 }
 
 .form-other {
@@ -128,13 +142,12 @@ button[type="submit"]:hover {
 
 .form-link {
     padding-left: 0.5rem;
-    color: #5046e2;
+    color: #9ab28c;
     cursor: pointer;
     text-decoration: none;
 }
 
 .form-link:hover {
-    color: #6a10cb;
     text-decoration: underline;
 }
 

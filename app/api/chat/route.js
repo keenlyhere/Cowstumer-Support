@@ -1,5 +1,5 @@
 import { firestore } from "@/firebase";
-import { addDoc, collection, doc, getDocs, orderBy, query, serverTimestamp, setDoc, updateDoc, where } from "firebase/firestore";
+import { addDoc, collection, getDocs, orderBy, query, serverTimestamp, updateDoc, where } from "firebase/firestore";
 import { NextResponse } from "next/server";
 import OpenAI from 'openai';
 
@@ -76,10 +76,6 @@ Encourage Engagement: Encourage users to engage with the app's features and prov
 Collect Feedback: Prompt users to provide feedback and suggestions to help improve the app.
 `
 
-// export async function GET(req) {
-//     getMessages();
-// }
-
 export async function addMessage(userId, chatId, role, content) {
     const messagesCollection = collection(firestore, 'Messages');
     // console.log('userId, chatId, role, content:\n', userId, chatId, role, content)
@@ -101,7 +97,7 @@ export async function addMessage(userId, chatId, role, content) {
 
     if (!querySnapshot.empty) {
         const chatDoc = querySnapshot.docs[0];
-        console.log("!querySnapshot.empty", chatDoc.data());
+        // console.log("!querySnapshot.empty", chatDoc.data());
 
         await updateDoc(chatDoc.ref, {
             updatedAt: serverTimestamp()
@@ -109,54 +105,100 @@ export async function addMessage(userId, chatId, role, content) {
     }
 }
 
-export async function POST(req) {
-    const openai = new OpenAI();
-    const { data, chatId, session, content } = await req.json();
-    // console.log(data);
-    console.log('post - session:', session);
+// format response
+function formatResponse(response) {
+    // replace markdown-style bold with HTML bold tags
+    response = response.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
-    let newChatId = chatId ? chatId : '';
-    console.log('newChatId before try:', newChatId);
+    // replace numbered items with HTML list items
+    response = response.replace(/(\d+)\.\s(.*?)($|(\d+)\.\s)/g, '<li>$2</li>');
+
+    // replace newline characters with <br> tags
+    response = response.replace(/\n/g, '<br>');
+
+    // wrap the list items in an unordered list
+    response = response.replace(/<li>(.*?)<\/li>/g, '<ul>$&</ul>');
+
+    return response;
+}
+
+// post new chat message & new chat if no chat specified
+export async function POST(req) {
+    try {
+        const openai = new OpenAI();
+        const { data, chatId, session, content } = await req.json();
+
+        let newChatId = chatId ? chatId : '';
+
+        // create a new chat if there is no current chat
+        if (!chatId) {
+            try {
+                const title = content.split(' ').slice(0, 5).join(' ');
+
+                const chatsCollection = collection(firestore, 'Chats');
+                const chatRef = await addDoc(chatsCollection, {
+                    userId: session.user.id,
+                    title,
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp(),
+                });
+
+                await updateDoc(chatRef, {
+                    id: chatRef.id,
+                })
+
+                newChatId = chatRef.id;
+            } catch (error) {
+                console.error('Error creating chat: ', error);
+            }
+        }
+
+        addMessage(session.user.id, newChatId, 'user', content);
+
+        const completion = await openai.chat.completions.create({
+            messages: [
+                {role: "system", content: systemPrompt},
+                ...data
+            ],
+            model: "gpt-4o-mini",
+        });
+
+        const botResponse = completion.choices[0].message.content;
+        const formattedResponse = formatResponse(botResponse);
+
+        await addMessage(null, newChatId, 'assistant', formattedResponse);
+
+        return NextResponse.json({ message: formattedResponse, chatId: newChatId }, { status: 200 });
+    } catch (error) {
+        console.error('Error creating message:', error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+}
+
+// get one chat
+export async function GET(req) {
+    const { searchParams } = new URL(req.url);
+    const chatId = searchParams.get('chatId');
 
     if (!chatId) {
-        try {
-            const chatsCollection = collection(firestore, 'Chats');
-            const chatRef = await addDoc(chatsCollection, {
-                userId: session.user.id,
-                createdAt: serverTimestamp(),
-                updatedAt: serverTimestamp(),
-            });
-            console.log('new chatRef.id:', chatRef.id);
-            await updateDoc(chatRef, {
-                id: chatRef.id,
-            })
-
-            newChatId = chatRef.id;
-
-            console.log('newChatId after try:', newChatId);
-
-            // return NextResponse.json({ chatId: chatRef.id });
-        } catch (error) {
-            console.error('Error creating chat: ', error);
-            // return NextResponse.json({ error: error.message }, { status: 500 })
-        }
+        return NextResponse.json({ error: 'ChatId is required' }, { status: 400 });
     }
 
-    addMessage(session.user.id, newChatId, 'user', content);
+    try {
+        const chatMessagesQuery = query(
+            collection(firestore, 'Messages'),
+            where('chatId', '==', chatId),
+            orderBy('createdAt', 'asc'),
+        );
 
-    const completion = await openai.chat.completions.create({
-        messages: [
-            {role: "system", content: systemPrompt},
-            ...data
-        ],
-        model: "gpt-4o-mini",
-    });
+        const querySnapshot = await getDocs(chatMessagesQuery);
+        const messages = querySnapshot.docs.map((doc) => ({ ...doc.data() }));
+        // console.log('Messages from chatId', chatId, '\n', messages);
 
-    const botResponse = completion.choices[0].message.content;
-    // const lastMessage = data[data.length - 1];
+        return NextResponse.json({ messages });
+    } catch (error) {
+        console.error('Error fetching chat messages:', error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
 
-    await addMessage(null, newChatId, 'assistant', botResponse);
-
-
-    return NextResponse.json({ message: completion.choices[0].message.content, chatId: newChatId }, { status: 200 });
 }

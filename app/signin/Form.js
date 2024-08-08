@@ -11,6 +11,8 @@ export default function Form() {
   const [ errors, setErrors ] = useState({});
   const [ showPassword, setShowPassword ] = useState(false);
   const router = useRouter();
+  const demoEmail = process.env.NEXT_PUBLIC_DEMO_EMAIL;
+  const demoPassword = process.env.NEXT_PUBLIC_DEMO_PASSWORD;
 
   const validate = () => {
     const newErrors = {};
@@ -62,6 +64,24 @@ export default function Form() {
     }
   }
 
+  const handleDemoLogin = async () => {
+    try {
+      const response = await signIn('credentials', {
+        email: demoEmail,
+        password: demoPassword,
+        redirect: false,
+      })
+
+      if (response?.error) {
+        setErrors({ general: 'Invalid email or password' });
+      } else if (response.ok) {
+        router.push('/');
+      }
+    } catch (error) {
+        console.error('Error signing in:', error);
+    }
+  }
+
   return (
     <div className="form-container">
       <form onSubmit={handleSubmit}>
@@ -93,6 +113,7 @@ export default function Form() {
         </div>
         <button type="submit">Sign In</button>
       </form>
+        <button className="button-demo" onClick={handleDemoLogin}>Sign In To Demo User</button>
     </div>
   )
 }

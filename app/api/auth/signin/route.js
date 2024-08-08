@@ -3,15 +3,7 @@ import { hash } from "bcrypt";
 import { addDoc, collection, getDocs, query, serverTimestamp, updateDoc, where } from "firebase/firestore";
 import { NextResponse } from "next/server";
 
-export async function GET(req, res) {
-    try {
-        
-    } catch (error) {
-
-    }
-}
-
-export async function POST(req, res) {
+export async function POST(req) {
     try {
         const { email, password } = await req.json();
         const userCollection = collection(firestore, 'Users');

@@ -1,10 +1,11 @@
 import { firestore } from "@/firebase";
 import { authOptions } from "@/lib/authOptions";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
-export async function POST(req) {
+// update email
+export async function PUT(req) {
     const { email, newEmail } = await req.json();
     try {
         const session = getServerSession(authOptions);
@@ -13,7 +14,7 @@ export async function POST(req) {
             NextResponse.json({ error: 'Not authorized' }, { status: 400 })
         }
 
-        const userQuery = collection(firestore, 'Users');
+        const userQuery = query(collection(firestore, 'Users'), where('email', '==', email));
         const querySnapshot = await getDocs(userQuery);
 
         if (querySnapshot.empty) {

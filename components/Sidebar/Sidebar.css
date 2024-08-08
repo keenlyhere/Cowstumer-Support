@@ -1,6 +1,6 @@
 .sidebar {
   width: 300px;
-  background-color: #c9e2bb;
+  background-color: #ffffff;
   color: white;
   display: flex;
   flex-direction: column;
@@ -10,7 +10,8 @@
 
 .sidebar-header {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
 }
 
@@ -21,10 +22,12 @@
   padding: 1rem;
   cursor: pointer;
   border-radius: 8px;
+  width: 100%;
 }
 
-.sign-out-button:hover {
-  background-color: #E1F8D4;
+.sign-out-button:hover,
+.chat-item:hover {
+  background-color: #c9e2bb;
   border-radius: 8px;
   cursor: pointer;
   color: #1b3012;
@@ -33,16 +36,25 @@
 .sidebar-content {
   flex: 1;
   margin-top: 20px;
+  overflow: auto;
 }
 
-.chat-history-item {
+.chat-item {
   padding: 10px;
   margin-bottom: 10px;
-  background-color: #4b47c3;
   border-radius: 4px;
   cursor: pointer;
 }
 
-.chat-history-item:hover {
-  background-color: #f5fbf2;
+.sidebar-heading {
+  padding: 1rem 10px;
+  font-weight: 600;
+}
+
+.active {
+  background-color: #c9e2bb;
+}
+
+.sidebar-footer {
+  padding-top: 10px;
 }

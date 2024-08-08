@@ -103,9 +103,6 @@ export default function Form() {
             <span className="password-toggle" onClick={() => setShowPassword(!showPassword)}>
               { showPassword ? <FaEyeSlash /> : <FaEye /> }
             </span>
-            {/* <button type="button" onClick={() => setShowPassword(!showPassword)} className="show-password-button">
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
-            </button> */}
           </div>
           { errors.password && <p className="error">{ errors.password }</p> }
         </div>

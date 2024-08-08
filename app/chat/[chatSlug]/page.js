@@ -1,13 +1,11 @@
 'use client'
 import { useEffect, useState } from 'react';
 import '@/components/ChatInterface/ChatInterface.css';
-import { useChatContext } from '@/context/ChatContext';
 import { addMessage, createChat } from '@/lib/firebaseServices';
 import { useSession } from 'next-auth/react';
 
 export default function ChatInterface() {
     const { data: session } = useSession();
-    // const { chatId, setChatId } = useChatContext();
     const [ messages, setMessages ] = useState([{
         role: 'assistant',
         content: `Hi! I'm the cowstumer support assistant for Daily Moo'd. How can I help you today?`
@@ -21,50 +19,37 @@ export default function ChatInterface() {
         }
     }, [session]);
 
-//   useEffect(() => {
-//     const initiateChat = async () => {
-//         if (session) {
-//             const chatId = await createChat(session.user.id);
-//             setChatId(chatId);
-//         }
-//     }
+    const sendMessage = async () => {
+        const userMessage = { role: 'user', content: message };
+        const newMessages = [ ...messages, userMessage ];
+        setMessages(newMessages);
+        setMessage('');
+        setLoading(true);
 
-//     initiateChat();
-//   }, [ session ])
+        if (chatId) {
+            await addMessage(session.user.id, chatId, 'user', message);
+        }
 
-  const sendMessage = async () => {
-    const userMessage = { role: 'user', content: message };
-    const newMessages = [ ...messages, userMessage ];
-    setMessages(newMessages);
-    setMessage('');
-    setLoading(true);
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ data: [...messages, { role: 'user', content: message }], chatId })
+            })
 
-    if (chatId) {
-        await addMessage(session.user.id, chatId, 'user', message);
-    }
-
-    try {
-        const response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ data: [...messages, { role: 'user', content: message }], chatId })
-        })
-
-        const data = await response.json();
-        const botMessage = { role: 'assistant', content: data.message };
-        setMessages([ ...newMessages, botMessage ]);
-    } catch (error) {
-        console.error('Error sending message:', error);
-        const errorMessage = { role: 'assistant', content: 'Oops! Something went wrong. Please try again.' };
-        setMessages([ ...newMessages, errorMessage ]);
-    } finally {
-        setLoading(false);
-    }
-
-
-  };
+            const data = await response.json();
+            const botMessage = { role: 'assistant', content: data.message };
+            setMessages([ ...newMessages, botMessage ]);
+        } catch (error) {
+            console.error('Error sending message:', error);
+            const errorMessage = { role: 'assistant', content: 'Oops! Something went wrong. Please try again.' };
+            setMessages([ ...newMessages, errorMessage ]);
+        } finally {
+            setLoading(false);
+        }
+    };
 
   return (
     <div className='content-container'>
